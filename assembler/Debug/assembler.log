@@ -1,2 +1,7 @@
-﻿  assembler.vcxproj -> C:\Users\ashkanvafaee\Desktop\assembler\Debug\assembler.exe
-  assembler.vcxproj -> C:\Users\ashkanvafaee\Desktop\assembler\Debug\assembler.pdb (Full PDB)
+﻿  assembler.c
+c:\users\ashkan\documents\github\ee460n_lab-1\assembler\assembler.c(133): warning C4018: '<': signed/unsigned mismatch
+c:\users\ashkan\documents\github\ee460n_lab-1\assembler\assembler.c(63): warning C4047: 'initializing': 'char **' differs in levels of indirection from 'char *'
+c:\users\ashkan\documents\github\ee460n_lab-1\assembler\assembler.c(168): warning C4018: '<': signed/unsigned mismatch
+c:\users\ashkan\documents\github\ee460n_lab-1\assembler\assembler.c(164): warning C4101: 'lRet': unreferenced local variable
+  assembler.vcxproj -> C:\Users\Ashkan\Documents\GitHub\EE460N_Lab-1\assembler\Debug\assembler.exe
+  assembler.vcxproj -> C:\Users\Ashkan\Documents\GitHub\EE460N_Lab-1\assembler\Debug\assembler.pdb (Partial PDB)
