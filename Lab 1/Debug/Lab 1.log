@@ -1,0 +1,115 @@
+﻿  assembler.c
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(66): warning C4013: 'readAndParse' undefined; assuming extern returning int
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(83): warning C4047: 'function': 'char **' differs in levels of indirection from 'char *'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(83): warning C4024: 'assemblyToHex': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(83): warning C4024: 'assemblyToHex': different types for formal and actual parameter 2
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(83): warning C4024: 'assemblyToHex': different types for formal and actual parameter 3
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(83): warning C4024: 'assemblyToHex': different types for formal and actual parameter 4
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(46): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(47): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(78): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(137): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(137): warning C4024: 'getOpcode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(139): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(139): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(140): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(140): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(153): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(153): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(154): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(154): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(167): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(167): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(169): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(169): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(177): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(177): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(179): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(179): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(186): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(186): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(188): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(188): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(195): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(195): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(197): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(197): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(204): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(204): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(206): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(206): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(213): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(213): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(215): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(215): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(222): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(222): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(224): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(224): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(231): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(231): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(233): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(233): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(240): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(240): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(245): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(245): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(247): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(247): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(253): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(253): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(255): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(255): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(261): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(261): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(263): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(263): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(269): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(269): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(272): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(272): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(278): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(278): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(281): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(281): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(286): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(286): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(286): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(286): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(288): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(288): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(293): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(293): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(298): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(298): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(300): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(300): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(305): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(305): warning C4024: 'strcmp': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(310): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(310): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(313): warning C4047: 'function': 'char *' differs in levels of indirection from 'char **'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(313): warning C4024: 'checkAddressingMode': different types for formal and actual parameter 1
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(364): warning C4018: '<': signed/unsigned mismatch
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(365): warning C4013: 'tolower' undefined; assuming extern returning int
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(377): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(439): note: see declaration of 'strtok'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(383): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(439): note: see declaration of 'strtok'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(388): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(439): note: see declaration of 'strtok'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(392): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(439): note: see declaration of 'strtok'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(395): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(439): note: see declaration of 'strtok'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(399): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\string.h(439): note: see declaration of 'strtok'
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(360): warning C4101: 'lRet': unreferenced local variable
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(427): warning C4013: 'isdigit' undefined; assuming extern returning int
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(452): warning C4013: 'isxdigit' undefined; assuming extern returning int
+c:\users\genki\documents\visual studio 2017\projects\lab 1\lab 1\assembler.c(320): warning C4715: 'assemblyToHex': not all control paths return a value
+  Lab 1.vcxproj -> C:\Users\Genki\documents\visual studio 2017\Projects\Lab 1\Debug\Lab 1.exe
+  Lab 1.vcxproj -> C:\Users\Genki\documents\visual studio 2017\Projects\Lab 1\Debug\Lab 1.pdb (Partial PDB)
