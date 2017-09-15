@@ -30,7 +30,7 @@ enum {	/*Addressing modes*/
 
 int getOpcode(char*);
 int toNum(char*);
-int assemblyToHex(char**, char**, char**, char**);
+int assemblyToDec(char**, char**, char**, char**, TableEntry);
 int checkAddressingMode(char*);
 
 int main(int argc, char* argv[]) {
@@ -55,15 +55,15 @@ int main(int argc, char* argv[]) {
 		exit(4);
 	}
 
-	char lLine[255 + 1], *lLabel, *lOpcode, *lArg1, *lArg2, *lArg3;
+	char lLine[255 + 1], *lLabel, *lOpcode, *lArg1, *lArg2, *lArg3, *lArg4;
 	int lRet;
 
+	int tableIndex = 0;
+	int pc;
 	for (int pass = 1; pass <= 2; pass++)		/*Make 2 passes*/
 	{
-		int pc;
-		int tableIndex = 0;
 		do {
-			lRet = readAndParse(infile, lLine, &lLabel, &lOpcode, &lArg1, &lArg2, &lArg3);
+			lRet = readAndParse(infile, lLine, &lLabel, &lOpcode, &lArg1, &lArg2, &lArg3, &lArg4);
 			if (lRet != DONE && lRet != EMPTY_LINE) {
 				if (pass == 1) {				/*1st pass: Fill in the symbol table*/
 					if (getOpcode(lOpcode) == ORIG) {
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 					}
 				}
 				else if (pass == 2) {
-					assemblyToHex(lOpcode, lArg1, lArg2, lArg3);
+					assemblyToDec(lOpcode, lArg1, lArg2, lArg3, symbolTable, tableIndex, pc);
 				}
 				pc = pc + 2;		/*Increment the PC*/
 			}
@@ -132,7 +132,11 @@ int getOpcode(char* line) {
 	return -1;
 }
 
-int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) {
+int registerNumber(char* arg) {		/*Must check that it's a register first!*/
+	return arg[1] - 0x30;
+}
+
+int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, TableEntry symbolTable[], int tableIndex, int pc) {
 	int addressingMode = -1;
 	int opcode = getOpcode(pOpcode);
 	if (opcode == ADD) {
@@ -141,10 +145,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 			exit(4);
 		}
 		if (addressingMode == REGISTER) {
-
+			return registerNumber(pArg3) + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 4096;
 		}
 		else if (addressingMode == IMMEDIATE) {
-
+			int value = 0;
+			if (toNum(pArg3) < 0)
+				value = 32 - toNum(pArg3);
+			else
+				value = toNum(pArg3);
+			if (value < 0 || value > 31)
+				exit(3);
+			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 4096;
 		}
 		else
 			exit(4);
@@ -155,10 +166,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 			exit(4);
 		}
 		if (addressingMode == REGISTER) {
-
+			return registerNumber(pArg3) + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 20480;
 		}
 		else if (addressingMode == IMMEDIATE) {
-
+			int value = 0;
+			if (toNum(pArg3) < 0)
+				value = 32 - toNum(pArg3);
+			else
+				value = toNum(pArg3);
+			if (value < 0 || value > 31)
+				exit(3);
+			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 20480;
 		}
 		else
 			exit(4);
@@ -169,6 +187,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (checkAddressingMode(pArg1) == LABEL) {
 			/*Address of label is PC+2 + (sign extended offset x 2) */
 			/*PC Offset = (Label Address - (PC+2))/2 */
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset;
 		}
 		else
 			exit(4);
@@ -177,7 +206,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 2048;
 		}
 		else
 			exit(4);
@@ -186,7 +225,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 1024;
 		}
 		else
 			exit(4);
@@ -195,7 +244,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 512;
 		}
 		else
 			exit(4);
@@ -204,7 +263,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 2048 + 1024;
 		}
 		else
 			exit(4);
@@ -213,7 +282,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 1024 + 512;
 		}
 		else
 			exit(4);
@@ -222,7 +301,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 2048 + 512;
 		}
 		else
 			exit(4);
@@ -231,7 +320,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 2048 + 1024 + 512;
 		}
 		else
 			exit(4);
@@ -245,7 +344,7 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == REGISTER) {
-
+			return registerNumber(pArg1) * 64 + 49152;
 		}
 		else exit(4);
 	}
@@ -253,7 +352,17 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = 0;
+			for (int i = 0; i < tableIndex; i++)
+			{
+				if (strcmp(symbolTable[i].label, pArg1) == 0) {
+					labelAddress = symbolTable[i].address;
+					break;
+				}
+			}
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			return pcOffset + 2048 + 16384;
 		}
 		else exit(4);
 	}
@@ -261,7 +370,7 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == REGISTER) {
-
+			return registerNumber(pArg1) * 64 + 16384;
 		}
 		else exit(4);
 	}
@@ -270,7 +379,14 @@ int assemblyToHex(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3) 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-
+			int offset = 0;
+			if (toNum(pArg3) < 0)
+				offset = 64 - toNum(pArg3);
+			else
+				offset = toNum(pArg3);
+			if (offset < 0 || offset > 63)
+				exit(3);
+			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 8192;
 		}
 		else exit(4);
 	}
@@ -346,6 +462,7 @@ int checkAddressingMode(char* arg) {
 	exit(4);		/*The operand is not supported*/
 }
 
+
 int labelToAddress(char* label, int tableLength) {
 	for (int i = 0; i < tableLength; i++)
 	{
@@ -355,7 +472,7 @@ int labelToAddress(char* label, int tableLength) {
 	exit(1);			/*Lable undefined. Return Error code 1*/
 }
 
-int readAndParse(FILE * pInfile, char * pLine, char ** pLabel, char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3)
+int readAndParse(FILE * pInfile, char * pLine, char ** pLabel, char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, char ** pArg4)
 {
 	char * lRet, *lPtr;
 	int i;
@@ -398,7 +515,7 @@ int readAndParse(FILE * pInfile, char * pLine, char ** pLabel, char ** pOpcode, 
 
 	if (!(lPtr = strtok(NULL, "\t\n ,"))) return(OK);
 
-	/* *pArg4 = lPtr; */
+	*pArg4 = lPtr;
 
 	return(OK);
 }
