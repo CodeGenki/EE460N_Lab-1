@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 FILE* infile = NULL;
 FILE* outfile = NULL;
@@ -21,7 +22,7 @@ enum {
 	ADD, AND, BR, BRn, BRz, BRp, BRzp, BRnp, BRnz, BRnzp,
 	HALT, JMP, JSR, JSRR, LDB, LDW, LEA, NOP, NOT, RET, LSHF,
 	RSHFL, RSHFA, RTI, STB, STW, TRAP, XOR,
-	ORIG, END, FILL
+	ORIG, END, FILL, NonLabel
 };
 
 enum {	/*Addressing modes*/
@@ -30,8 +31,9 @@ enum {	/*Addressing modes*/
 
 int getOpcode(char*);
 int toNum(char*);
-int assemblyToDec(char**, char**, char**, char**, TableEntry);
+int assemblyToDec(char*, char*, char*, char*, int, int);
 int checkAddressingMode(char*);
+char* decToHex(int);
 
 int main(int argc, char* argv[]) {
 
@@ -59,7 +61,7 @@ int main(int argc, char* argv[]) {
 	int lRet;
 
 	int tableIndex = 0;
-	int pc;
+	int pc = -1;
 	for (int pass = 1; pass <= 2; pass++)		/*Make 2 passes*/
 	{
 		do {
@@ -67,21 +69,59 @@ int main(int argc, char* argv[]) {
 			if (lRet != DONE && lRet != EMPTY_LINE) {
 				if (pass == 1) {				/*1st pass: Fill in the symbol table*/
 					if (getOpcode(lOpcode) == ORIG) {
+						if (pc != -1)
+							exit(4);
 						pc = toNum(lArg1);
+						if (pc % 2 == 1)
+							exit(3);
+						if (pc < 0 || pc > 0xFFFF)
+							exit(3);		/*Invalid constant (out of range)*/
 						continue;
 					}
-					else if (getOpcode(lOpcode) == END) {
+					if (pc == -1)
+						exit(4);		/*pc is never initialized so .ORIG is not the first thing.*/
+					/*else if (getOpcode(lOpcode) == END) {
 						break;
-					}
+					}*/
 					if (strcmp(lLabel, "") != 0) {
+						for (int i = 0; i < tableIndex; i++)
+						{
+							if (strcmp(lLabel, symbolTable[i].label) == 0)
+								exit(4);
+						}
+						int j = 0;
+						while (lLabel[j] != '\0') {
+							if (isalnum(lLabel[j] == 0))
+								exit(4);
+							j++;
+						}
 						symbolTable[tableIndex].address = pc;
 						strcpy(symbolTable[tableIndex].label, lLabel);
 						tableIndex++;
 					}
 				}
 				else if (pass == 2) {
-					assemblyToDec(lOpcode, lArg1, lArg2, lArg3, symbolTable, tableIndex, pc);
+					if (getOpcode(lOpcode) == ORIG) {
+						if (pc != -1)
+							exit(4);
+						pc = toNum(lArg1);
+						if (pc % 2 == 1)
+							exit(3);
+						if (pc < 0 || pc > 0xFFFF)
+							exit(3);		/*Invalid constant (out of range)*/
+						continue;
+					}
+					if (pc == -1)
+						exit(4);		/*pc is never initialized so .ORIG is not the first thing.*/
+					else {
+						int result = assemblyToDec(lOpcode, lArg1, lArg2, lArg3, tableIndex, pc);
+						if (result == -1)
+							lRet = DONE;
+						fprintf(outfile, "0x%.4X\n", result);
+					}
 				}
+				if (pc > 0xFFFF)
+					exit(4);		/*Program goes beyond memory*/
 				pc = pc + 2;		/*Increment the PC*/
 			}
 		} while (lRet != DONE);
@@ -89,6 +129,9 @@ int main(int argc, char* argv[]) {
 		{
 			printf("%d\t%s\n", symbolTable[i].address, symbolTable[i].label);
 		}
+		pc = -1;
+		rewind(infile);
+
 	}
 	
 	fclose(infile);
@@ -128,7 +171,14 @@ int getOpcode(char* line) {
 	if (strcmp(line, ".orig") == 0)	return ORIG;
 	if (strcmp(line, ".end") == 0)	return END;
 	if (strcmp(line, ".fill") == 0)	return FILL;
-
+	if (strcmp(line, "in") == 0 || strcmp(line, "out") == 0 || strcmp(line, "getc") == 0
+		|| strcmp(line, "puts") == 0 || strcmp(line, "x") == 0) 
+		return NonLabel;
+	if (line[2] == '\0' && line[0] == 'r') {
+		int regNum = line[1] - 0x30;
+		if (regNum < 8)
+			return NonLabel;
+	}
 	return -1;
 }
 
@@ -136,9 +186,25 @@ int registerNumber(char* arg) {		/*Must check that it's a register first!*/
 	return arg[1] - 0x30;
 }
 
-int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, TableEntry symbolTable[], int tableIndex, int pc) {
+int findLabel(char* label, int tableIndex) {
+	int labelAddress = -1;
+	for (int i = 0; i < tableIndex; i++)
+	{
+		if (strcmp(symbolTable[i].label, label) == 0) {
+			labelAddress = symbolTable[i].address;
+			break;
+		}
+	}
+	if (labelAddress == -1)
+		exit(1);		/*Lable doesn't exist*/
+	return labelAddress;
+}
+
+int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int tableIndex, int pc) {
 	int addressingMode = -1;
 	int opcode = getOpcode(pOpcode);
+	if (opcode == -1)
+		exit(2);
 	if (opcode == ADD) {
 		addressingMode = checkAddressingMode(pArg3);
 		if (checkAddressingMode(pArg1) != REGISTER || checkAddressingMode(pArg2) != REGISTER) {
@@ -149,12 +215,16 @@ int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, 
 		}
 		else if (addressingMode == IMMEDIATE) {
 			int value = 0;
-			if (toNum(pArg3) < 0)
-				value = 32 - toNum(pArg3);
-			else
+			if (toNum(pArg3) < 0) {
+				value = 32 + toNum(pArg3);
+				if (value < 0 || value > 31)
+					exit(3);
+			}
+			else {
 				value = toNum(pArg3);
-			if (value < 0 || value > 31)
-				exit(3);
+				if (value < 0 || value > 15)
+					exit(3);
+			}
 			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 4096;
 		}
 		else
@@ -170,178 +240,166 @@ int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, 
 		}
 		else if (addressingMode == IMMEDIATE) {
 			int value = 0;
-			if (toNum(pArg3) < 0)
-				value = 32 - toNum(pArg3);
-			else
+			if (toNum(pArg3) < 0) {
+				value = 32 + toNum(pArg3);
+				if (value < 0 || value > 31)
+					exit(3);
+			}
+			else {
 				value = toNum(pArg3);
-			if (value < 0 || value > 31)
-				exit(3);
+				if (value < 0 || value > 15)
+					exit(3);
+			}
 			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 20480;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BR) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			/*Address of label is PC+2 + (sign extended offset x 2) */
 			/*PC Offset = (Label Address - (PC+2))/2 */
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRn) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0? pcOffset*-1:pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 2048;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRz) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 1024;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRp) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 512;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRnz) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 2048 + 1024;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRzp) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 1024 + 512;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRnp) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 2048 + 512;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == BRnzp) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
 			return pcOffset + 2048 + 1024 + 512;
 		}
 		else
 			exit(4);
 	}
 	if (opcode == HALT) {
-		if (strcmp(pArg1, '\0') != 0 || strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg1, "") != 0 || strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		return 0xF025;
 	}
 	if (opcode == JMP) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == REGISTER) {
 			return registerNumber(pArg1) * 64 + 49152;
@@ -349,25 +407,23 @@ int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, 
 		else exit(4);
 	}
 	if (opcode == JSR) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
-			int labelAddress = 0;
-			for (int i = 0; i < tableIndex; i++)
-			{
-				if (strcmp(symbolTable[i].label, pArg1) == 0) {
-					labelAddress = symbolTable[i].address;
-					break;
-				}
-			}
+			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 2047)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 2048 + pcOffset;
 			return pcOffset + 2048 + 16384;
 		}
 		else exit(4);
 	}
 	if (opcode == JSRR) {
-		if (strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == REGISTER) {
 			return registerNumber(pArg1) * 64 + 16384;
@@ -380,12 +436,16 @@ int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, 
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
 			int offset = 0;
-			if (toNum(pArg3) < 0)
-				offset = 64 - toNum(pArg3);
-			else
+			if (toNum(pArg3) < 0) {
+				offset = 64 + toNum(pArg3);
+				if (offset < 0 || offset > 63)
+					exit(3);
+			}
+			else {
 				offset = toNum(pArg3);
-			if (offset < 0 || offset > 63)
-				exit(3);
+				if (offset < 0 || offset > 31)
+					exit(3);
+			}
 			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 8192;
 		}
 		else exit(4);
@@ -395,30 +455,49 @@ int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-
+			int offset = 0;
+			if (toNum(pArg3) < 0) {
+				offset = 64 + toNum(pArg3);
+				if (offset < 0 || offset > 63)
+					exit(3);
+			}
+			else {
+				offset = toNum(pArg3);
+				if (offset < 0 || offset > 31)
+					exit(3);
+			}
+			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 24576;
 		}
 	}
 	if (opcode == LEA) {
-		if (strcmp(pArg3, '\0') != 0 || checkAddressingMode(pArg1) != REGISTER)
+		if (strcmp(pArg3, "") != 0 || checkAddressingMode(pArg1) != REGISTER)
 			exit(4);
 		if (checkAddressingMode(pArg2) == LABEL) {
-
+			int pcOffset = 0;
+			int labelAddress = findLabel(pArg2, tableIndex);
+			pcOffset = (labelAddress - (pc + 2)) / 2;
+			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
+			if (check < 0 || check > 511)
+				exit(3);
+			if (pcOffset < 0)
+				pcOffset = 512 + pcOffset;
+			return pcOffset + registerNumber(pArg1) * 512 + 57344;
 		}
 	}
 	if (opcode == NOP) {
-		if (strcmp(pArg1, '\0') != 0 || strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg1, "") != 0 || strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		return 0x0000;
 	}
 	if (opcode == NOT) {
-		if (strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg3, "") != 0)
 			exit(4);
 		if (checkAddressingMode(pArg1) == REGISTER && checkAddressingMode(pArg2) == REGISTER) {
-
+			return 63 + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 36864;
 		}
 	}
 	if (opcode == RET) {
-		if (strcmp(pArg1, '\0') != 0 || strcmp(pArg2, '\0') != 0 || strcmp(pArg3, '\0') != 0)
+		if (strcmp(pArg1, "") != 0 || strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		return 0xC1C0;
 	}
@@ -427,31 +506,128 @@ int assemblyToDec(char ** pOpcode, char ** pArg1, char ** pArg2, char ** pArg3, 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-
+			int value = toNum(pArg3);
+			if (value < 0 || value > 15)
+				exit(3);
+			return value + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 53248;
 		}
 	}
 	if (opcode == RSHFL) {
-		
+		int value = toNum(pArg3);
+		if (value < 0 || value > 15)
+			exit(3);
+		return value + 16 + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 53248;
 	}
+	if (opcode == RSHFA) {
+		int value = toNum(pArg3);
+		if (value < 0 || value > 15)
+			exit(3);
+		return value + 16 + 32 + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 53248;
+	}
+	if (opcode == RTI) {
+		if (strcmp(pArg1, "") != 0 || strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
+			exit(4);
+		return 0x8000;
+	}
+	if (opcode == STB) {
+		if (checkAddressingMode(pArg1) != REGISTER || checkAddressingMode(pArg2) != REGISTER) {
+			exit(4);
+		}
+		if (checkAddressingMode(pArg3) == IMMEDIATE) {
+			int offset = 0;
+			if (toNum(pArg3) < 0) {
+				offset = 64 + toNum(pArg3);
+				if (offset < 0 || offset > 63)
+					exit(3);
+			}
+			else {
+				offset = toNum(pArg3);
+				if (offset < 0 || offset > 31)
+					exit(3);
+			}
+			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 12288;
+		}
+		else exit(4);
+	}
+	if (opcode == STW) {
+		if (checkAddressingMode(pArg1) != REGISTER || checkAddressingMode(pArg2) != REGISTER) {
+			exit(4);
+		}
+		if (checkAddressingMode(pArg3) == IMMEDIATE) {
+			int offset = 0;
+			if (toNum(pArg3) < 0) {
+				offset = 64 + toNum(pArg3);
+				if (offset < 0 || offset > 63)
+					exit(3);
+			}
+			else {
+				offset = toNum(pArg3);
+				if (offset < 0 || offset > 31)
+					exit(3);
+			}
+			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 28672;
+		}
+		else exit(4);
+	}
+	if (opcode == TRAP) {
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
+			exit(4);
+		if (checkAddressingMode(pArg1) == IMMEDIATE) {
+			if (pArg1[0] != 'x') {
+				exit(4);		/*Given vector is not in hex*/
+			}
+			int value = 0;
+			value = toNum(pArg1);
+			if (value < 0 || value > 0xFF)
+				exit(3);
+			if (value > 0x25 && value <= 0xFF)
+				exit(4);
+			return value + 0xF000;
+		}
+	}
+	if (opcode == XOR) {
+		if (checkAddressingMode(pArg1) != REGISTER || checkAddressingMode(pArg2) != REGISTER) {
+			exit(4);
+		}
+		if (checkAddressingMode(pArg3) == REGISTER) {
+			return registerNumber(pArg3) + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 0x9000;
+		}
+		else if (checkAddressingMode(pArg3) == IMMEDIATE) {
+			int value = 0;
+			if (toNum(pArg3) < 0) {
+				value = 32 + toNum(pArg3);
+				if (value < 0 || value > 31)
+					exit(3);
+			}
+			else {
+				value = toNum(pArg3);
+				if (value < 0 || value > 15)
+					exit(3);
+			}
+			return value + 32 + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 0x9000;
+		}
+	}
+	if (opcode == FILL) {
+		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
+			exit(4);
+		int value = toNum(pArg1);
+		if (value < 0 || value > 0xFFFF)
+			exit(3);
+		return value;
+	}
+	if (opcode == END) {
+		if (strcmp(pArg1, "") != 0 || strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
+			exit(4);
+		return -1;
+	}
+	exit(4);
 }
 
 int checkAddressingMode(char* arg) {
 	if (arg[0] == '\0')
 		exit(4);		/*The argument doesn't contain a value*/
-	if (arg[0] == 'R' && (arg[1] - 0x30) >= 0 && (arg[1] - 0x30) <= 7 && arg[2] == '\0')
+	if (arg[0] == 'r' && (arg[1] - 0x30) >= 0 && (arg[1] - 0x30) <= 7 && arg[2] == '\0')
 		return REGISTER;
-	int i = 0;
-	int isNumber = 1;
-	while (arg[i] != '\0') {
-		if (arg[i] - 0x30 < 0 && arg[i] - 0x30 > 9) {
-			isNumber = -1;
-			break;
-		}
-		else isNumber = 1;
-		i++;
-	}
-	if (isNumber == 1)
-		return IMMEDIATE;
 	int j = 0;
 	while(symbolTable[j].address != 0)
 	{
@@ -459,9 +635,10 @@ int checkAddressingMode(char* arg) {
 			return LABEL;
 		j++;
 	}
+	int i = toNum(arg);
+	return IMMEDIATE;
 	exit(4);		/*The operand is not supported*/
 }
-
 
 int labelToAddress(char* label, int tableLength) {
 	for (int i = 0; i < tableLength; i++)
