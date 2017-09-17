@@ -115,8 +115,10 @@ int main(int argc, char* argv[]) {
 						exit(4);		/*pc is never initialized so .ORIG is not the first thing.*/
 					else {
 						int result = assemblyToDec(lOpcode, lArg1, lArg2, lArg3, tableIndex, pc);
-						if (result == -1)
+						if (result == -1) {
 							lRet = DONE;
+							break;
+						}
 						fprintf(outfile, "0x%.4X\n", result);
 					}
 				}
@@ -580,8 +582,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			value = toNum(pArg1);
 			if (value < 0 || value > 0xFF)
 				exit(3);
-			if (value > 0x25 && value <= 0xFF)
-				exit(4);
+			/*if (value > 0x25 && value <= 0xFF)
+				exit(4);*/
 			return value + 0xF000;
 		}
 	}
@@ -611,8 +613,11 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		int value = toNum(pArg1);
-		if (value < 0 || value > 0xFFFF)
+		int check = value < 0 ? value * -1 : value;
+		if (check < 0 || check > 32767)
 			exit(3);
+		if (value < 0)
+			value = 65536 + value;
 		return value;
 	}
 	if (opcode == END) {
