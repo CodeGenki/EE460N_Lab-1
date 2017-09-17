@@ -133,11 +133,13 @@ int main(int argc, char* argv[]) {
 				pc = pc + 2;		/*Increment the PC*/
 			}
 		} while (lRet != DONE);
+		/*
 		int i;
 		for (i = 0; i < tableIndex; i++)
 		{
 			printf("%d\t%s\n", symbolTable[i].address, symbolTable[i].label);
 		}
+		*/
 		pc = -1;
 		rewind(infile);
 
@@ -507,7 +509,7 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			exit(4);
 		if (checkAddressingMode(pArg2) == -1)
 			exit(1);				/*Invalid label*/
-		if (addressingMode == LABEL) {
+		if (checkAddressingMode(pArg2) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg2, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
