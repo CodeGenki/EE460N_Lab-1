@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
 						}
 						int j = 0;
 						while (lLabel[j] != '\0') {
-							if (isalnum(lLabel[j] == 0))
+							if (isalnum(lLabel[j]) == 0)
 								exit(4);
 							j++;
 						}
@@ -676,7 +676,7 @@ int readAndParse(FILE * pInfile, char * pLine, char ** pLabel, char ** pOpcode, 
 	if (!(lPtr = strtok(pLine, "\t\n ,")))
 		return(EMPTY_LINE);
 
-	if (getOpcode(lPtr) == -1 && lPtr[0] != '.') /* found a label */
+	if (getOpcode(lPtr) == -1) /* found a label */
 	{
 		*pLabel = lPtr;
 		if (!(lPtr = strtok(NULL, "\t\n ,"))) return(OK);
