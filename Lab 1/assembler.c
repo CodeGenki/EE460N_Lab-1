@@ -260,6 +260,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BR) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			/*Address of label is PC+2 + (sign extended offset x 2) */
 			/*PC Offset = (Label Address - (PC+2))/2 */
@@ -279,6 +281,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRn) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -296,6 +300,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRz) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -313,6 +319,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRp) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -330,6 +338,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRnz) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -347,6 +357,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRzp) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -364,6 +376,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRnp) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -381,6 +395,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == BRnzp) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -411,6 +427,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == JSR) {
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
+		if (checkAddressingMode(pArg1) == -1)
+			exit(1);				/*Invalid label*/
 		if (checkAddressingMode(pArg1) == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
@@ -474,7 +492,9 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 	if (opcode == LEA) {
 		if (strcmp(pArg3, "") != 0 || checkAddressingMode(pArg1) != REGISTER)
 			exit(4);
-		if (checkAddressingMode(pArg2) == LABEL) {
+		if (checkAddressingMode(pArg2) == -1)
+			exit(1);				/*Invalid label*/
+		if (addressingMode == LABEL) {
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg2, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
@@ -633,14 +653,21 @@ int checkAddressingMode(char* arg) {
 		exit(4);		/*The argument doesn't contain a value*/
 	if (arg[0] == 'r' && (arg[1] - 0x30) >= 0 && (arg[1] - 0x30) <= 7 && arg[2] == '\0')
 		return REGISTER;
+	int labels = -1;
 	int j = 0;
-	while(symbolTable[j].address != 0)
+	while(strcmp(symbolTable[j].label, "") != 0)
 	{
 		if (strcmp(arg, symbolTable[j].label) == 0)
 			return LABEL;
 		j++;
 	}
-	int i = toNum(arg);
+	int c = 0;
+	while (arg[c] != '\0') {
+		if (arg[c] - 0x30 < 0 || arg[c] - 0x30 > 9)
+			return -1;
+		c++;
+	}
+	/*int i = toNum(arg);*/
 	return IMMEDIATE;
 	exit(4);		/*The operand is not supported*/
 }
