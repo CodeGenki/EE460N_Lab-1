@@ -8,6 +8,7 @@ FILE* outfile = NULL;
 
 #define MAX_LABEL_LEN 20
 #define MAX_SYMBOLS 255
+#define INT_MAX       2147483647    /*maximum (signed) int value*/
 typedef struct {
 	int address;
 	char label[MAX_LABEL_LEN + 1];
@@ -33,7 +34,6 @@ int getOpcode(char*);
 int toNum(char*);
 int assemblyToDec(char*, char*, char*, char*, int, int);
 int checkAddressingMode(char*);
-char* decToHex(int);
 
 int main(int argc, char* argv[]) {
 
@@ -62,7 +62,9 @@ int main(int argc, char* argv[]) {
 
 	int tableIndex = 0;
 	int pc = -1;
-	for (int pass = 1; pass <= 2; pass++)		/*Make 2 passes*/
+	int end = 0;
+	int pass;
+	for (pass = 1; pass <= 2; pass++)		/*Make 2 passes*/
 	{
 		do {
 			lRet = readAndParse(infile, lLine, &lLabel, &lOpcode, &lArg1, &lArg2, &lArg3, &lArg4);
@@ -84,11 +86,14 @@ int main(int argc, char* argv[]) {
 						break;
 					}*/
 					if (strcmp(lLabel, "") != 0) {
-						for (int i = 0; i < tableIndex; i++)
+						int i;
+						for (i = 0; i < tableIndex; i++)
 						{
 							if (strcmp(lLabel, symbolTable[i].label) == 0)
 								exit(4);
 						}
+						if (getOpcode(lLabel) == NonLabel)
+							exit(4);		/*Invalid label*/
 						int j = 0;
 						while (lLabel[j] != '\0') {
 							if (isalnum(lLabel[j]) == 0)
@@ -117,6 +122,7 @@ int main(int argc, char* argv[]) {
 						int result = assemblyToDec(lOpcode, lArg1, lArg2, lArg3, tableIndex, pc);
 						if (result == -1) {
 							lRet = DONE;
+							end++;
 							break;
 						}
 						fprintf(outfile, "0x%.4X\n", result);
@@ -127,7 +133,8 @@ int main(int argc, char* argv[]) {
 				pc = pc + 2;		/*Increment the PC*/
 			}
 		} while (lRet != DONE);
-		for (int i = 0; i < tableIndex; i++)
+		int i;
+		for (i = 0; i < tableIndex; i++)
 		{
 			printf("%d\t%s\n", symbolTable[i].address, symbolTable[i].label);
 		}
@@ -135,7 +142,10 @@ int main(int argc, char* argv[]) {
 		rewind(infile);
 
 	}
-	
+
+	if (end == 0)
+		exit(4);	/*There is no .END*/
+
 	fclose(infile);
 	fclose(outfile);
 
@@ -174,13 +184,15 @@ int getOpcode(char* line) {
 	if (strcmp(line, ".end") == 0)	return END;
 	if (strcmp(line, ".fill") == 0)	return FILL;
 	if (strcmp(line, "in") == 0 || strcmp(line, "out") == 0 || strcmp(line, "getc") == 0
-		|| strcmp(line, "puts") == 0 || strcmp(line, "x") == 0) 
+		|| strcmp(line, "puts") == 0 || line[0] == 'x') 
 		return NonLabel;
 	if (line[2] == '\0' && line[0] == 'r') {
 		int regNum = line[1] - 0x30;
 		if (regNum < 8)
 			return NonLabel;
 	}
+	if (line[0] - 0x30 >= 0 && line[0] - 0x30 <= 9)
+		return NonLabel;
 	return -1;
 }
 
@@ -190,7 +202,8 @@ int registerNumber(char* arg) {		/*Must check that it's a register first!*/
 
 int findLabel(char* label, int tableIndex) {
 	int labelAddress = -1;
-	for (int i = 0; i < tableIndex; i++)
+	int i;
+	for (i = 0; i < tableIndex; i++)
 	{
 		if (strcmp(symbolTable[i].label, label) == 0) {
 			labelAddress = symbolTable[i].address;
@@ -205,7 +218,7 @@ int findLabel(char* label, int tableIndex) {
 int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int tableIndex, int pc) {
 	int addressingMode = -1;
 	int opcode = getOpcode(pOpcode);
-	if (opcode == -1)
+	if (opcode == -1 || opcode == NonLabel)
 		exit(2);
 	if (opcode == ADD) {
 		addressingMode = checkAddressingMode(pArg3);
@@ -663,8 +676,29 @@ int checkAddressingMode(char* arg) {
 	}
 	int c = 0;
 	while (arg[c] != '\0') {
-		if (arg[c] - 0x30 < 0 || arg[c] - 0x30 > 9)
+		if (arg[0] != '#' && arg[0] != 'x') {
 			return -1;
+		}
+		else if (c > 0) {
+			if (arg[0] == '#') {
+				if (arg[c] - 0x30 < 0 || arg[c] - 0x30 > 9) {
+					if (arg[1] == '-') {
+						c++;
+						continue;
+					}
+					return -1;
+				}
+			}
+			else if (arg[0] == 'x') {
+				if (arg[c] - 0x30 < 0 || (arg[c] - 0x30 > 9 && arg[c] < 'a') || arg[c] > 'f') {
+					if (arg[1] == '-') {
+						c++;
+						continue;
+					}
+					return -1;
+				}
+			}
+		}
 		c++;
 	}
 	/*int i = toNum(arg);*/
@@ -673,7 +707,8 @@ int checkAddressingMode(char* arg) {
 }
 
 int labelToAddress(char* label, int tableLength) {
-	for (int i = 0; i < tableLength; i++)
+	int i;
+	for (i = 0; i < tableLength; i++)
 	{
 		if (strcmp(label, symbolTable[i].label) == 0)
 			return symbolTable[i].address;
@@ -703,7 +738,7 @@ int readAndParse(FILE * pInfile, char * pLine, char ** pLabel, char ** pOpcode, 
 	if (!(lPtr = strtok(pLine, "\t\n ,")))
 		return(EMPTY_LINE);
 
-	if (getOpcode(lPtr) == -1) /* found a label */
+	if (getOpcode(lPtr) == -1 || getOpcode(lPtr) == NonLabel) /* found a label */
 	{
 		*pLabel = lPtr;
 		if (!(lPtr = strtok(NULL, "\t\n ,"))) return(OK);
