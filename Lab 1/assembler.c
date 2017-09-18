@@ -1,3 +1,10 @@
+/*
+Name 1: Genki Oji
+Name 2: Ashkan Vafaee
+UTEID 1: gto99
+UTEID 2: av28837
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -283,8 +290,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) -1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -302,8 +309,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0? pcOffset*-1:pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0? (pcOffset*-1) - 1 :pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -321,8 +328,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -340,8 +347,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -359,8 +366,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -378,8 +385,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -397,8 +404,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -416,8 +423,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -448,8 +455,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg1, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 2047)
+			int check = pcOffset<0 ? (pcOffset*-1) - 1 : pcOffset;
+			if (check < 0 || check > 1023)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 2048 + pcOffset;
@@ -513,8 +520,8 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			int pcOffset = 0;
 			int labelAddress = findLabel(pArg2, tableIndex);
 			pcOffset = (labelAddress - (pc + 2)) / 2;
-			int check = pcOffset<0 ? pcOffset*-1 : pcOffset;
-			if (check < 0 || check > 511)
+			int check = pcOffset<0 ? (pcOffset*-1) -1 : pcOffset;
+			if (check < 0 || check > 255)
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
@@ -648,8 +655,10 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 		if (strcmp(pArg2, "") != 0 || strcmp(pArg3, "") != 0)
 			exit(4);
 		int value = toNum(pArg1);
-		int check = value < 0 ? value * -1 : value;
-		if (check < 0 || check > 32767)
+		int check = value < 0 ? (value * -1 ) -1: value;
+		if (check < 0 || check > 65535)
+			exit(3);
+		if (value < -32768)
 			exit(3);
 		if (value < 0)
 			value = 65536 + value;

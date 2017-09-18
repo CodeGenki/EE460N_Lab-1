@@ -1,0 +1,8 @@
+.ORIG x3000		;asdfasdfasdf
+
+
+RSHFA R1, R1, x-5
+
+
+
+.END

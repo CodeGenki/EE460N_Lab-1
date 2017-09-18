@@ -1,7 +1,0 @@
-.ORIG x3000
-		AND R0, R2, R1	;x3000
-label1	ADD R1, R2, R0	;x3002
-label2  NOT R2, R2, R1	;x3004
-		BR	label1
-		HALT
-.END

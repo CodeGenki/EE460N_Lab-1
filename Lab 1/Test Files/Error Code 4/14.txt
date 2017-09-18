@@ -1,0 +1,6 @@
+.ORIG x3000		;asdfasdfasdf
+
+R1 ADD R1, R1, R1
+ADD R0, R0, R0
+.END	;asdfasdf
+

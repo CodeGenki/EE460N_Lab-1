@@ -4,4 +4,9 @@
     <LocalDebuggerCommandArguments>test.txt a.out</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerWorkingDirectory>.</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>shuffle.asm output.obj</LocalDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>

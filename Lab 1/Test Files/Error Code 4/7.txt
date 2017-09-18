@@ -1,0 +1,14 @@
+.ORIG x3000		;asdfasdfasdf
+
+
+
+LABEL ADD R1, R1, R1
+
+ADD R1, R1, R1
+
+LAbEL ADD R1, R1, R1
+
+
+
+
+.END

@@ -1,0 +1,7 @@
+.ORIG x3000		;asdfasdfasdf
+ADD R0, R1, R1
+
+TRAP x-25
+
+
+.END

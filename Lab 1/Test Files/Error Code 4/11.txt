@@ -1,0 +1,6 @@
+.ORIG 0xFFFE
+ADD R2,R1,R0 ; address: 0xFFFE
+AND R2,R3,R4 ; out of bounds. Yield error 4.
+ADD R0,R0,R0
+
+.END

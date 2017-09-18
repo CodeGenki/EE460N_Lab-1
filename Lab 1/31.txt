@@ -1,0 +1,5 @@
+.ORIG #0
+
+AND R0, R1, R2
+ADD R1, R1, R1
+.END

@@ -1,0 +1,5 @@
+.ORIG x3000		;asdfasdfasdf
+
+TRAP #25
+.END	;asdfasdf
+

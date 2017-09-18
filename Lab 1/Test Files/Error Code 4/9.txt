@@ -1,0 +1,9 @@
+;asfdasdf
+.ORIG x-5		;asdfasdfasdf
+
+ADD R0, R1, R1
+.END	;asdfasdf
+
+
+
+;asdfaasdf

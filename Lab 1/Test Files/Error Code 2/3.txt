@@ -1,0 +1,6 @@
+.ORIG x3000		;asdfasdfasdf
+
+
+ADDD R0,R0,R1
+.END	;asdfasdf
+

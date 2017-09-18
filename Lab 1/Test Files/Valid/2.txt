@@ -1,0 +1,28 @@
+;asfdasdf
+.ORIG xFFFF		;asdfasdfasdf
+
+ADD R0, R1, R1
+
+
+
+NOP ;asdfasdf
+
+RET ;asdfasdf
+
+HALT ;asdfasdf
+
+
+.FILL #55
+
+.FILL #-55
+
+.FILL x30
+
+.FILL X-30
+
+
+.END	;asdfasdf
+
+
+
+;asdfaasdf
