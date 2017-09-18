@@ -121,6 +121,7 @@ int main(int argc, char* argv[]) {
 							exit(3);
 						if (pc < 0 || pc > 0xFFFF)
 							exit(3);		/*Invalid constant (out of range)*/
+						fprintf(outfile, "0x%.4X\n", toNum(lArg1));
 						continue;
 					}
 					if (pc == -1)
