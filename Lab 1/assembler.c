@@ -239,9 +239,19 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			return registerNumber(pArg3) + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 4096;
 		}
 		else if (addressingMode == IMMEDIATE) {
-			int value = 0;
-			if (toNum(pArg3) < 0) {
-				value = 32 + toNum(pArg3);
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 15)
+				exit(3);
+			if (value < 0)
+				value = 32 + value;
+			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 4096;
+		}
+		else
+			exit(4);
+			/*if (toNum(pArg3) < 0) {
+				
 				if (value < 0 || value > 31)
 					exit(3);
 			}
@@ -253,7 +263,7 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 4096;
 		}
 		else
-			exit(4);
+			exit(4);*/
 	}
 	if (opcode == AND) {
 		addressingMode = checkAddressingMode(pArg3);
@@ -264,17 +274,13 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			return registerNumber(pArg3) + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 20480;
 		}
 		else if (addressingMode == IMMEDIATE) {
-			int value = 0;
-			if (toNum(pArg3) < 0) {
-				value = 32 + toNum(pArg3);
-				if (value < 0 || value > 31)
-					exit(3);
-			}
-			else {
-				value = toNum(pArg3);
-				if (value < 0 || value > 15)
-					exit(3);
-			}
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 15)
+				exit(3);
+			if (value < 0)
+				value = 32 + value;
 			return value + 32 + 64 * registerNumber(pArg2) + 512 * registerNumber(pArg1) + 20480;
 		}
 		else
@@ -638,17 +644,13 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			return registerNumber(pArg3) + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 0x9000;
 		}
 		else if (checkAddressingMode(pArg3) == IMMEDIATE) {
-			int value = 0;
-			if (toNum(pArg3) < 0) {
-				value = 32 + toNum(pArg3);
-				if (value < 0 || value > 31)
-					exit(3);
-			}
-			else {
-				value = toNum(pArg3);
-				if (value < 0 || value > 15)
-					exit(3);
-			}
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 15)
+				exit(3);
+			if (value < 0)
+				value = 32 + value;
 			return value + 32 + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 0x9000;
 		}
 	}
