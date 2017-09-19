@@ -484,18 +484,14 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-			int offset = 0;
-			if (toNum(pArg3) < 0) {
-				offset = 64 + toNum(pArg3);
-				if (offset < 0 || offset > 63)
-					exit(3);
-			}
-			else {
-				offset = toNum(pArg3);
-				if (offset < 0 || offset > 31)
-					exit(3);
-			}
-			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 8192;
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 31)
+				exit(3);
+			if (value < 0)
+				value = 64 + value;
+			return value + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 8192;
 		}
 		else exit(4);
 	}
@@ -504,18 +500,14 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-			int offset = 0;
-			if (toNum(pArg3) < 0) {
-				offset = 64 + toNum(pArg3);
-				if (offset < 0 || offset > 63)
-					exit(3);
-			}
-			else {
-				offset = toNum(pArg3);
-				if (offset < 0 || offset > 31)
-					exit(3);
-			}
-			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 24576;
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 31)
+				exit(3);
+			if (value < 0)
+				value = 64 + value;
+			return value + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 24576;
 		}
 	}
 	if (opcode == LEA) {
@@ -585,18 +577,14 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-			int offset = 0;
-			if (toNum(pArg3) < 0) {
-				offset = 64 + toNum(pArg3);
-				if (offset < 0 || offset > 63)
-					exit(3);
-			}
-			else {
-				offset = toNum(pArg3);
-				if (offset < 0 || offset > 31)
-					exit(3);
-			}
-			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 12288;
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 31)
+				exit(3);
+			if (value < 0)
+				value = 64 + value;
+			return value + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 12288;
 		}
 		else exit(4);
 	}
@@ -605,18 +593,14 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 			exit(4);
 		}
 		if (checkAddressingMode(pArg3) == IMMEDIATE) {
-			int offset = 0;
-			if (toNum(pArg3) < 0) {
-				offset = 64 + toNum(pArg3);
-				if (offset < 0 || offset > 63)
-					exit(3);
-			}
-			else {
-				offset = toNum(pArg3);
-				if (offset < 0 || offset > 31)
-					exit(3);
-			}
-			return offset + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 28672;
+			int value = toNum(pArg3);
+
+			int check = value < 0 ? (value * -1) - 1 : value;
+			if (check < 0 || check > 31)
+				exit(3);
+			if (value < 0)
+				value = 64 + value;
+			return value + registerNumber(pArg2) * 64 + registerNumber(pArg1) * 512 + 28672;
 		}
 		else exit(4);
 	}
