@@ -302,7 +302,7 @@ int assemblyToDec(char * pOpcode, char * pArg1, char * pArg2, char * pArg3, int 
 				exit(3);
 			if (pcOffset < 0)
 				pcOffset = 512 + pcOffset;
-			return pcOffset;
+			return pcOffset + 2048 + 1024 + 512;
 		}
 		else
 			exit(4);
